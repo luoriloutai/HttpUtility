@@ -52,7 +52,7 @@ namespace HttpUtility
         /// <param name="formTextContents">文本字段内容。如果不需要提交文本，则该参数赋为null即可，但文本与文件必须存在一个，不能同时为null</param>
         /// <param name="formFiles">文件。如果不需要提交文件，则该参数赋为null，但文本与文件必须存在一个，不能同时为null</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostMultipartContentAsync(string requestUrl, List<MultipartText> formTextContents, List<MultipartFile> formFiles)
+        public static async Task<HttpResponseMessage> PostMultipartContentAsync(string requestUrl, List<MultipartText> formTextContents, List<MultipartLocalFile> formFiles)
         {
             if (formTextContents == null && formFiles == null)
             {
@@ -101,6 +101,60 @@ namespace HttpUtility
                 return msg;
             }
         }
+
+
+        /// <summary>
+        /// 提交多部分内容（包含文本字段和文件）表单内容。用于提交文本和文件混合的情况。该方法支持只包含文本内容或只包含文件的情况，不需要的部分赋值为null即可，但不能两部分都为null
+        /// </summary>
+        /// <param name="requestUrl">请求Url</param>
+        /// <param name="formTextContents">文本字段内容。如果不需要提交文本，则该参数赋为null即可，但文本与文件必须存在一个，不能同时为null</param>
+        /// <param name="formInputFiles">包含文件流的文件内容。所需数据从HttpContext.Current.Request.Files中可以获取</param>
+        /// <returns></returns>
+        public static async Task<HttpResponseMessage> PostMultipartContentAsync(string requestUrl, List<MultipartText> formTextContents, List<MultiPartInputFile> formInputFiles)
+        {
+            if (formTextContents == null && formInputFiles == null)
+            {
+                throw new Exception("文本内容与文件必须存在一个");
+            }
+
+            using (var multipartContent = new MultipartFormDataContent())
+            {
+                // 向请求添加文本内容
+                if (formTextContents != null)
+                {
+                    foreach (var textContent in formTextContents)
+                    {
+                        multipartContent.Add(new StringContent(textContent.Content, textContent.Encoding, textContent.MediaType));
+                    }
+                }
+
+                var fileStreams = new List<Stream>();
+
+                // 向请求添加文件
+                if (formInputFiles != null)
+                {
+                    foreach (var file in formInputFiles)
+                    {
+                        var streamContent = new StreamContent(file.InputFileStream);
+                        multipartContent.Add(streamContent, file.HttpName, file.FileName);
+                        fileStreams.Add(file.InputFileStream);
+                    }
+                }
+
+                if (multipartContent.Count() == 0)
+                {
+                    throw new ArgumentException("没有检测到提交的数据");
+                }
+                var resp = await client.PostAsync(requestUrl, multipartContent);
+                var msg = resp.EnsureSuccessStatusCode();
+                foreach (var s in fileStreams)
+                {
+                    s.Close();
+                }
+                return resp;
+            }
+        }
+
 
         /// <summary>
         /// 提交只包含文本的表单内容，形式为键值对，类型为application/x-www-form-urlencoded
