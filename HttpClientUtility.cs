@@ -30,17 +30,17 @@ namespace HttpUtility
             }
         }
 
-        
+
         /// <summary>
         /// 添加请求头部
         /// </summary>
         /// <param name="name">名称</param>
         /// <param name="value">值</param>
-        public static void AddRequestHeader(string name,string value)
+        public static void AddRequestHeader(string name, string value)
         {
             if (client != null)
             {
-                client.DefaultRequestHeaders.Add(name,value);
+                client.DefaultRequestHeaders.Add(name, value);
             }
         }
 
@@ -232,5 +232,46 @@ namespace HttpUtility
             var msg = resp.EnsureSuccessStatusCode();
             return msg;
         }
+
+
+        /// <summary>
+        /// 下载文件
+        /// </summary>
+        /// <param name="sourceUrl">资源地址</param>
+        /// <param name="saveDir">保存到的目录</param>
+        /// <param name="saveFileName">将要保存的文件名</param>
+        /// <returns></returns>
+        public static async Task DownloadFile(string sourceUrl, string saveDir, string saveFileName = "")
+        {
+            var resp = await GetAsync(sourceUrl);
+            if (!resp.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException("请求资源出错");
+            }
+            if (string.IsNullOrWhiteSpace(saveFileName))
+            {
+                saveFileName = Path.GetFileNameWithoutExtension(sourceUrl);
+            }
+            var filePath = saveDir + "/" + saveFileName + Path.GetExtension(sourceUrl);
+            var fileStream = new FileStream(filePath, FileMode.Create);
+            var downloadStream = await resp.Content.ReadAsStreamAsync();
+
+            downloadStream.CopyTo(fileStream); // 用下面注释的方式也可以
+
+            //var buffer = new byte[10240];  // 10K大小缓存
+            //var readBytes = 0;
+            //var readPosition = 0;
+            //do
+            //{
+            //    readBytes = downloadStream.Read(buffer, 0, buffer.Length);
+            //    fileStream.Write(buffer, 0, readBytes);
+            //    readPosition += readBytes;
+            //} while (readPosition < downloadStream.Length);
+
+
+            fileStream.Close();
+            downloadStream.Close();
+        }
+
     }
 }
