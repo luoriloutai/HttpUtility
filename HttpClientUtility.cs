@@ -206,6 +206,22 @@ namespace HttpUtility
 
 
         /// <summary>
+        /// Post请求，发送一个字符串
+        /// </summary>
+        /// <param name="requestUrl">请求Url</param>
+        /// <param name="data">提交的字符串数据</param>
+        /// <param name="encoding">编码</param>
+        /// <returns></returns>
+        public static async Task<HttpResponseMessage> PostStringAsync(string requestUrl, string data, Encoding encoding)
+        {
+            var bodyContent = new StringContent(data, encoding, "text/plain");
+            var resp = await client.PostAsync(requestUrl, bodyContent);
+            var msg = resp.EnsureSuccessStatusCode();
+            return msg;
+        }
+
+
+        /// <summary>
         /// 发送Get请求
         /// </summary>
         /// <param name="requestUrl">请求Url</param>
