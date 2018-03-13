@@ -1,6 +1,6 @@
 # HttpUtility
 
-·´ÕıÒ²Ã»Ê²Ã´ÈË¿´£¬¾ÍÓÃõ¿½ÅµÄÍáÎÄĞ´Ò»Ğ´¡£
+åæ­£ä¹Ÿæ²¡ä»€ä¹ˆäººçœ‹ï¼Œå°±ç”¨è¹©è„šçš„æ­ªæ–‡å†™ä¸€å†™ã€‚
 
 
 A http tool that using HttpClient.
@@ -12,7 +12,8 @@ It depend on NewtonSoft.Json.
 
 ## Get Request
 var resp = await Utility.GetAsync("requestUrl");
-var ret = await resp.Content.ReadAsAsync<object>();  // the generic type can be other class type,here is object
+// the generic type can be other class type,here is object
+var ret = await resp.Content.ReadAsAsync<object>();  
 
 ## Post a object within Json format
 var data = new {name="Luoriloutai"};
@@ -26,8 +27,10 @@ var ret = await resp.Content.ReadAsAsync<object>();
 ## Post multipart content
 1.This method using for upload local file with web input element.In this case that we can't get the path of uploading file: 
 
-var files = HttpContext.Current.Request.Files; // assuming there are files had been uploaded
-var file = files[0]; // get the first file here
+// assuming there are files had been uploaded
+var files = HttpContext.Current.Request.Files;
+// get the first file here
+var file = files[0]; 
 var fileInfo = new MultiPartInputFile
 {
     FileName = file.FileName,
