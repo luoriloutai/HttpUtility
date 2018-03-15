@@ -1,0 +1,9 @@
+F:\Projs\MyProj\Repo\HttpUtility\bin\Debug\netstandard2.0\HttpUtility.deps.json
+F:\Projs\MyProj\Repo\HttpUtility\bin\Debug\netstandard2.0\HttpUtility.dll
+F:\Projs\MyProj\Repo\HttpUtility\bin\Debug\netstandard2.0\HttpUtility.pdb
+F:\Projs\MyProj\Repo\HttpUtility\obj\Debug\netstandard2.0\HttpUtility.csprojResolveAssemblyReference.cache
+F:\Projs\MyProj\Repo\HttpUtility\obj\Debug\netstandard2.0\HttpUtility.csproj.CoreCompileInputs.cache
+F:\Projs\MyProj\Repo\HttpUtility\obj\Debug\netstandard2.0\HttpUtility.AssemblyInfoInputs.cache
+F:\Projs\MyProj\Repo\HttpUtility\obj\Debug\netstandard2.0\HttpUtility.AssemblyInfo.cs
+F:\Projs\MyProj\Repo\HttpUtility\obj\Debug\netstandard2.0\HttpUtility.dll
+F:\Projs\MyProj\Repo\HttpUtility\obj\Debug\netstandard2.0\HttpUtility.pdb

@@ -3,26 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HttpUtility
 {
     public class HttpClientUtility
     {
-        private static HttpClient client;
+        private HttpClient client;
 
         // 私有构造函数，阻止外部创建对象
         private HttpClientUtility()
-        {
-
-        }
-
-        /// <summary>
-        /// 静态构造函数，初始化静态HttpClient对象
-        /// </summary>
-        static HttpClientUtility()
         {
             if (client == null)
             {
@@ -32,15 +26,38 @@ namespace HttpUtility
 
 
         /// <summary>
+        /// 创建HttpClientUtility的实例
+        /// </summary>
+        /// <returns></returns>
+        public static HttpClientUtility Create()
+        {
+            return new HttpClientUtility();
+        }
+
+
+        /// <summary>
         /// 添加请求头部
         /// </summary>
         /// <param name="name">名称</param>
         /// <param name="value">值</param>
-        public static void AddRequestHeader(string name, string value)
+        public void AddRequestHeader(string name, string value)
         {
             if (client != null)
             {
                 client.DefaultRequestHeaders.Add(name, value);
+            }
+        }
+
+
+        /// <summary>
+        /// 移除指定名称的请求头部
+        /// </summary>
+        /// <param name="name"></param>
+        public void RemoveRequestHeader(string name)
+        {
+            if (client != null)
+            {
+                client.DefaultRequestHeaders.Remove(name);
             }
         }
 
@@ -52,7 +69,7 @@ namespace HttpUtility
         /// <param name="formTextContents">文本字段内容。如果不需要提交文本，则该参数赋为null即可，但文本与文件必须存在一个，不能同时为null</param>
         /// <param name="formFiles">文件。如果不需要提交文件，则该参数赋为null，但文本与文件必须存在一个，不能同时为null</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostMultipartContentAsync(string requestUrl, List<MultipartText> formTextContents, List<MultipartLocalFile> formFiles)
+        public async Task<HttpResponseMessage> PostMultipartContentAsync(string requestUrl, List<MultipartText> formTextContents, List<MultipartLocalFile> formFiles)
         {
             if (formTextContents == null && formFiles == null)
             {
@@ -110,7 +127,7 @@ namespace HttpUtility
         /// <param name="formTextContents">文本字段内容。如果不需要提交文本，则该参数赋为null即可，但文本与文件必须存在一个，不能同时为null</param>
         /// <param name="formInputFiles">包含文件流的文件内容。所需数据从HttpContext.Current.Request.Files中可以获取</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostMultipartContentAsync(string requestUrl, List<MultipartText> formTextContents, List<MultiPartInputFile> formInputFiles)
+        public async Task<HttpResponseMessage> PostMultipartContentAsync(string requestUrl, List<MultipartText> formTextContents, List<MultiPartInputFile> formInputFiles)
         {
             if (formTextContents == null && formInputFiles == null)
             {
@@ -151,7 +168,7 @@ namespace HttpUtility
                 {
                     s.Close();
                 }
-                return resp;
+                return msg;
             }
         }
 
@@ -162,7 +179,7 @@ namespace HttpUtility
         /// <param name="requestUrl">请求Url</param>
         /// <param name="content">内容</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostFormUrlEncodedContentAsync(string requestUrl, IEnumerable<KeyValuePair<string, string>> content)
+        public async Task<HttpResponseMessage> PostFormUrlEncodedContentAsync(string requestUrl, IEnumerable<KeyValuePair<string, string>> content)
         {
             var bodyContent = new FormUrlEncodedContent(content);
             var resp = await client.PostAsync(requestUrl, bodyContent);
@@ -179,7 +196,7 @@ namespace HttpUtility
         /// <param name="encoding">编码</param>
         /// <param name="mediaType">媒体类型，默认text/json，根据具体情况设置</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostStringContentAsync(string requestUrl, string content, Encoding encoding, string mediaType = "application/json")
+        public async Task<HttpResponseMessage> PostStringContentAsync(string requestUrl, string content, Encoding encoding, string mediaType = "application/json")
         {
             var bodyContent = new StringContent(content, encoding, mediaType);
             var resp = await client.PostAsync(requestUrl, bodyContent);
@@ -195,7 +212,7 @@ namespace HttpUtility
         /// <param name="obj">提交的对象</param>
         /// <param name="encoding">字符串的编码</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostObjectInJsonFormatAsync(string requestUrl, object data, Encoding encoding)
+        public async Task<HttpResponseMessage> PostObjectInJsonFormatAsync(string requestUrl, object data, Encoding encoding)
         {
             var jsonContent = JsonConvert.SerializeObject(data);
             var bodyContent = new StringContent(jsonContent, encoding, "application/json");
@@ -212,7 +229,7 @@ namespace HttpUtility
         /// <param name="data">提交的字符串数据</param>
         /// <param name="encoding">编码</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostStringAsync(string requestUrl, string data, Encoding encoding)
+        public async Task<HttpResponseMessage> PostStringAsync(string requestUrl, string data, Encoding encoding)
         {
             var bodyContent = new StringContent(data, encoding, "text/plain");
             var resp = await client.PostAsync(requestUrl, bodyContent);
@@ -226,7 +243,7 @@ namespace HttpUtility
         /// </summary>
         /// <param name="requestUrl">请求Url</param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> GetAsync(string requestUrl)
+        public async Task<HttpResponseMessage> GetAsync(string requestUrl)
         {
             var resp = await client.GetAsync(requestUrl);
             var msg = resp.EnsureSuccessStatusCode();
@@ -235,13 +252,13 @@ namespace HttpUtility
 
 
         /// <summary>
-        /// 下载文件
+        /// 下载小文件
         /// </summary>
         /// <param name="sourceUrl">资源地址</param>
         /// <param name="saveDir">保存到的目录</param>
         /// <param name="saveFileName">将要保存的文件名</param>
         /// <returns></returns>
-        public static async Task DownloadFile(string sourceUrl, string saveDir, string saveFileName = "")
+        public async Task DownloadFile(string sourceUrl, string saveDir, string saveFileName = "")
         {
             var resp = await GetAsync(sourceUrl);
             if (!resp.IsSuccessStatusCode)
@@ -251,6 +268,10 @@ namespace HttpUtility
             if (string.IsNullOrWhiteSpace(saveFileName))
             {
                 saveFileName = Path.GetFileNameWithoutExtension(sourceUrl);
+            }
+            if (!Directory.Exists(saveDir))
+            {
+                Directory.CreateDirectory(saveDir);
             }
             var filePath = saveDir + "/" + saveFileName + Path.GetExtension(sourceUrl);
             var fileStream = new FileStream(filePath, FileMode.Create);
@@ -272,6 +293,5 @@ namespace HttpUtility
             fileStream.Close();
             downloadStream.Close();
         }
-
     }
 }

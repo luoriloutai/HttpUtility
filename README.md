@@ -11,17 +11,17 @@ It depend on NewtonSoft.Json.
 # Useage:
 
 ## Get Request
-var resp = await Utility.GetAsync("requestUrl");  
+var resp = await HttpClientUtility.GetAsync("requestUrl");  
 // the generic type can be other class type,here is object  
 var ret = await resp.Content.ReadAsAsync<object>();  
 
 ## Post a object within Json format
 var data = new {name="Luoriloutai"};  
-var resp = await Utility.PostObjectInJsonFormatAsync($"requestUrl", data, Encoding.UTF8);  
+var resp = await HttpClientUtility.PostObjectInJsonFormatAsync($"requestUrl", data, Encoding.UTF8);  
 var ret = await resp.Content.ReadAsAsync<object>();
 
 ## Post string
-var resp = await Utility.PostStringAsync("requestUrl","data",Encoding.UTF8);  
+var resp = await HttpClientUtility.PostStringAsync("requestUrl","data",Encoding.UTF8);  
 var ret = await resp.Content.ReadAsAsync<object>();
 
 ## Post multipart content
@@ -38,7 +38,7 @@ var fileInfo = new MultiPartInputFile
     InputFileStream = file.InputStream  
 }  
 var files = new List<MultiPartInputFile> { file };   
-var resp = await Utility.PostMultipartContentAsync("requestUrl", null, files);  
+var resp = await HttpClientUtility.PostMultipartContentAsync("requestUrl", null, files);  
 var ret = await resp.Content.ReadAsAsync<object>();  
 
 2.This method using for the case that we can get the path of uploading file,in common, this will be desktop app programing:  
@@ -49,6 +49,6 @@ var files = new List<MultipartLocalFile>{
 		FileLocalPath="c:\\test.jpg"  
 	};  
 };  
-var resp = await Utility.PostMultipartContentAsync("requestUrl", null, files);  
+var resp = await HttpClientUtility.PostMultipartContentAsync("requestUrl", null, files);  
 var ret = await resp.Content.ReadAsAsync<object>();  
 
