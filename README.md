@@ -3,7 +3,7 @@
 反正也没什么人看，就用蹩脚的歪文写一写。
 
 
-A http tool that using HttpClient.
+A http tool that uses HttpClient class.
 
 It depend on NewtonSoft.Json.
 
