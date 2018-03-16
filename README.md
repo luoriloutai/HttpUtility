@@ -29,7 +29,7 @@ var resp = await ut.PostStringAsync("requestUrl","data",Encoding.UTF8);
 var ret = await resp.Content.ReadAsAsync<object>();
 
 ## Post multipart content
-1.This method using for upload local file with web input element.In this case that we can't get the path of uploading file:   
+1.This method is used for upload local file with web input element.In this case that we can't get the path of uploading file:   
 
 // assuming there are files had been uploaded  
 var files = HttpContext.Current.Request.Files;  
@@ -45,7 +45,7 @@ var files = new List<MultiPartInputFile> { file };
 var resp = await ut.PostMultipartContentAsync("requestUrl", null, files);  
 var ret = await resp.Content.ReadAsAsync<object>();  
 
-2.This method using for the case that we can get the path of uploading file,in common, this will be desktop app programing:  
+2.This method is used for the case that we can get the path of uploading file,in common, this will be desktop app programing:  
 
 var files = new List<MultipartLocalFile>{   
 	new MultipartLocalFile{  
